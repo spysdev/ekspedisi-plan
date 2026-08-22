@@ -2,9 +2,11 @@
 "use client";
 import React, { useState } from 'react';
 import ItineraryPanel from '@/components/ItineraryPanel';
-import MapPanel from '@/components/MapPanel';
+import dynamic from 'next/dynamic';
 import OptimizeButton from '@/components/OptimizeButton';
 import CalendarSyncButton from '@/components/CalendarSyncButton';
+
+const MapPanel = dynamic(() => import('@/components/MapPanel'), { ssr: false });
 
 export default function TripPage({ params }: { params: Promise<{ tripId: string }> }) {
   const unwrappedParams = React.use(params);
