@@ -6,7 +6,9 @@ import MapPanel from '@/components/MapPanel';
 import OptimizeButton from '@/components/OptimizeButton';
 import CalendarSyncButton from '@/components/CalendarSyncButton';
 
-export default function TripPage({ params }: { params: { tripId: string } }) {
+export default function TripPage({ params }: { params: Promise<{ tripId: string }> }) {
+  const unwrappedParams = React.use(params);
+  const tripId = unwrappedParams.tripId;
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRouteUpdate = () => {
@@ -16,11 +18,11 @@ export default function TripPage({ params }: { params: { tripId: string } }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 min-h-screen">
-      <ItineraryPanel tripId={params.tripId} />
+      <ItineraryPanel tripId={tripId} />
       <div className="flex flex-col space-y-4">
-        <MapPanel tripId={params.tripId} key={refreshKey} />
-        <OptimizeButton tripId={params.tripId} onRouteUpdate={handleRouteUpdate} />
-        <CalendarSyncButton tripId={params.tripId} />
+        <MapPanel tripId={tripId} key={refreshKey} />
+        <OptimizeButton tripId={tripId} onRouteUpdate={handleRouteUpdate} />
+        <CalendarSyncButton tripId={tripId} />
       </div>
     </div>
   );
