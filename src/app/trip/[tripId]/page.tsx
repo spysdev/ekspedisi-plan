@@ -22,7 +22,7 @@ export default function TripPage({ params }: { params: Promise<{ tripId: string 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 min-h-screen">
       <ItineraryPanel tripId={tripId} />
       <div className="flex flex-col space-y-4">
-        <MapPanel tripId={tripId} key={refreshKey} />
+        <MapPanel tripId={tripId} refreshKey={refreshKey} />
         <OptimizeButton tripId={tripId} onRouteUpdate={handleRouteUpdate} />
         <CalendarSyncButton tripId={tripId} />
       </div>

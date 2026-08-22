@@ -16,6 +16,7 @@ L.Icon.Default.mergeOptions({
 
 interface Props {
   tripId: string;
+  refreshKey?: number;
 }
 
 interface Coord {
@@ -31,7 +32,7 @@ function Recenter({ coord }: { coord: Coord }) {
   return null;
 }
 
-export default function MapPanel({ tripId }: Props) {
+export default function MapPanel({ tripId, refreshKey }: Props) {
   const [coords, setCoords] = useState<Coord[]>([]);
   const [route, setRoute] = useState<Coord[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -40,21 +41,21 @@ export default function MapPanel({ tripId }: Props) {
   useEffect(() => {
     const fetchItems = async () => {
       const { data, error } = await supabase
-        .from('trip_itinerary')
-        .select('latitude, longitude, order')
+        .from('itinerary_items')
+        .select('lat, lng, order_index')
         .eq('trip_id', tripId)
-        .order('order', { ascending: true });
+        .order('order_index', { ascending: true });
       if (error) {
         setError(error.message);
         return;
       }
       const points = (data as any[])
-        .filter((it) => it.latitude && it.longitude)
-        .map((it) => ({ lat: parseFloat(it.latitude), lng: parseFloat(it.longitude) } as Coord));
+        .filter((it) => it.lat != null && it.lng != null)
+        .map((it) => ({ lat: Number(it.lat), lng: Number(it.lng) } as Coord));
       setCoords(points);
     };
     fetchItems();
-  }, [tripId]);
+  }, [tripId, refreshKey]);
 
   // Fetch route from OSRM when we have coordinates (max 30 points as per user request)
   useEffect(() => {

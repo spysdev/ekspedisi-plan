@@ -20,9 +20,9 @@ import { CSS } from '@dnd-kit/utilities';
 
 interface ItineraryItem {
   id: string;
-  title: string;
-  location: string;
-  order: number;
+  place_name: string;
+  location?: string;
+  order_index: number;
 }
 
 interface Props {
@@ -34,8 +34,8 @@ function SortableItem({ item }: { item: ItineraryItem }) {
     <div className="p-2 bg-white dark:bg-gray-800 rounded shadow mb-2 flex items-center">
       <span className="cursor-move mr-2">☰</span>
       <div>
-        <p className="font-medium">{item.title}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{item.location}</p>
+        <p className="font-medium">{item.place_name}</p>
+        {item.location && <p className="text-sm text-gray-500 dark:text-gray-400">{item.location}</p>}
       </div>
     </div>
   );
@@ -47,11 +47,11 @@ export default function ItineraryPanel({ tripId }: Props) {
   // Load itinerary from Supabase
   useEffect(() => {
     const fetchItems = async () => {
-      const { data, error } = await supabase
-        .from('trip_itinerary')
-        .select('*')
-        .eq('trip_id', tripId)
-        .order('order', { ascending: true });
+        const { data, error } = await supabase
+          .from('itinerary_items')
+          .select('*')
+          .eq('trip_id', tripId)
+          .order('order_index', { ascending: true });
       if (error) console.error(error);
       else setItems(data as ItineraryItem[]);
     };
@@ -70,14 +70,14 @@ export default function ItineraryPanel({ tripId }: Props) {
       const newIndex = items.findIndex((i) => i.id === over.id);
       const newItems = arrayMove(items, oldIndex, newIndex).map((it, idx) => ({
         ...it,
-        order: idx,
+        order_index: idx,
       }));
       setItems(newItems);
       // Persist order to Supabase
       const updates = newItems.map((it) =>
         supabase
-          .from('trip_itinerary')
-          .update({ order: it.order })
+          .from('itinerary_items')
+          .update({ order_index: it.order_index })
           .eq('id', it.id)
       );
       await Promise.all(updates);
